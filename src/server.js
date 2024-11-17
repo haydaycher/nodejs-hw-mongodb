@@ -60,9 +60,9 @@ export const setupServer = () => {
     });
   });
 
-  // Middleware для обробки помилок
+  
   app.use((err, req, res, next) => {
-    console.error(err); // Логування помилок
+    console.error(err); 
     res.status(500).json({
       status: 500,
       message: 'Something went wrong',
@@ -70,7 +70,7 @@ export const setupServer = () => {
     });
   });
 
-  // Запуск сервера
+ 
   app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
   });
