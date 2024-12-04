@@ -1,4 +1,6 @@
 import express from 'express';
+// import { Router } from 'express';
+
 import cors from 'cors';
 import pino from 'pino-http';
 import { env } from './utils/env.js';
@@ -25,7 +27,6 @@ export const setupServer = () => {
   app.use(router);
 
   app.use('*', notFoundHandler);
-
   app.use(errorHandler);
 
   app.listen(PORT, () => {
