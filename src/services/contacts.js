@@ -1,45 +1,30 @@
-import { ContactsCollection } from '../db/models/Contact.js';
-import createHttpError from 'http-errors';
+import ContactCollection from '../db/models/Contact.js';
 
-export const getAllContacts = async () => {
-  const contacts = await ContactsCollection.find();
-  return contacts;
+export const getContacts = () => {
+  return ContactCollection.find();
 };
 
-export const getContactId = async (contactId) => {
-  const contact = await ContactsCollection.findById(contactId);
-  if (!contact) {
-    throw createHttpError(404, 'Contact is not found');
-  }
-  return contact;
+export const getContactById = (id) => {
+  return ContactCollection.findById(id);
 };
 
-export const createContactService = async (contactData) => {
-  const contact = new ContactsCollection(contactData);
-  await contact.save();
-  return contact;
+export const addContact = (payload) => {
+  return ContactCollection.create(payload);
+};
+export const updateContact = async ({ _id, payload, options = {} }) => {
+  const rawResult = await ContactCollection.findOneAndUpdate({ _id }, payload, {
+    ...options,
+    new: true,
+    includeResultMetadata: true,
+  });
+
+  if (!rawResult || !rawResult.value) return null;
+
+  return {
+    data: rawResult.value,
+    isNew: Boolean(rawResult.lastErrorObject.upserted),
+  };
 };
 
-export const updateContactController = async (contactId, contactData) => {
-  const updatedContact = await ContactsCollection.findByIdAndUpdate(
-    contactId,
-    contactData,
-    { new: true },
-  );
-
-  if (!updatedContact) {
-    throw createHttpError(404, 'Contact is not found');
-  }
-
-  return updatedContact;
-};
-
-export const deleteContactService = async (contactId) => {
-  const result = await ContactsCollection.findByIdAndDelete(contactId);
-
-  if (!result) {
-    throw createHttpError(404, 'Contact is not found');
-  }
-
-  return result;
-};
+export const deleteContact = async (filter) =>
+  ContactCollection.findOneAndDelete(filter);
