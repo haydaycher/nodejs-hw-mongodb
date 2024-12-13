@@ -1,32 +1,69 @@
-// import { SORT_ORDER } from '../constants/index.js';
+import { SORT_ORDER } from '../constants/index.js';
 import { ContactCollection } from '../db/models/Contact.js';
-// import { calculatePaginationData } from '../utils/calculatePaginationData.js';
+import { calculatePaginationData } from '../utils/calculatePaginationData.js';
 
-export const getContacts = () => {
-  return ContactCollection.find();
-};
+export const getAllContacts = async ({
+  page = 1,
+  perPage = 10,
+  sortBy = '_id',
+  sortOrder = SORT_ORDER.ASC,
+  filter = {},
+  userId,
+}) => {
+  const skip = page > 0 ? (page - 1) * perPage : 0;
 
-export const getContactById = (id) => {
-  return ContactCollection.findById(id);
-};
+  const contactsQuery = ContactCollection.find({ userId });
 
-export const addContact = (payload) => {
-  return ContactCollection.create(payload);
-};
-export const updateContact = async ({ _id, payload, options = {} }) => {
-  const rawResult = await ContactCollection.findOneAndUpdate({ _id }, payload, {
-    ...options,
-    new: true,
-    includeResultMetadata: true,
-  });
+  // Додаємо фільтри
+  if (filter.contactType) {
+    contactsQuery.where('contactType').equals(filter.contactType);
+  }
 
-  if (!rawResult || !rawResult.value) return null;
+  if (filter.isFavourite !== undefined) {
+    contactsQuery.where('isFavourite').equals(filter.isFavourite);
+  }
+
+  // Використовуємо Promise.all для оптимізації
+  const [contactsCount, contacts] = await Promise.all([
+    ContactCollection.find().merge(contactsQuery).countDocuments(),
+    contactsQuery
+      .skip(skip)
+      .limit(perPage)
+      .sort({ [sortBy]: sortOrder })
+      .exec(),
+  ]);
+
+  // Розрахунок даних пагінації
+  const paginationData = calculatePaginationData(contactsCount, perPage, page);
 
   return {
-    data: rawResult.value,
-    isNew: Boolean(rawResult.lastErrorObject.upserted),
+    data: contacts,
+    ...paginationData,
   };
 };
 
-export const deleteContact = async (filter) =>
-  ContactCollection.findOneAndDelete(filter);
+export const getContactById = async (contactId, userId) => {
+  return ContactCollection.findOne({
+    _id: contactId,
+    userId,
+  });
+};
+
+export const addContact = async (payload) => {
+  return ContactCollection.create(payload);
+};
+
+export const updateContact = async ({ contactId, payload, userId }) => {
+  return ContactCollection.findOneAndUpdate(
+    { _id: contactId, userId },
+    payload,
+    { new: true },
+  );
+};
+
+export const deleteContact = async ({ contactId, userId }) => {
+  return ContactCollection.findOneAndDelete({
+    _id: contactId,
+    userId,
+  });
+};
