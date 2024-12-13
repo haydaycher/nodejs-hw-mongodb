@@ -1,5 +1,5 @@
 import createHttpError from 'http-errors';
-
+import { createContactSchema } from '../validation/contacts.js';
 import * as contactServices from '../services/contacts.js';
 
 // export const getContactsController = async (req, res, next) => {
@@ -68,24 +68,19 @@ export const getContactsByIdController = async (req, res, next) => {
 // };
 export const addContactsController = async (req, res, next) => {
   try {
-    const { name, phoneNumber } = req.body;
+    // Використовуємо Joi для валідації запиту
+    await createContactSchema.validateAsync(req.body); // Валідація тіла запиту
 
-    // Приклад валідації
-    if (!name || name.length < 3) {
-      throw createHttpError(400, 'Name must be at least 3 characters long', {
-        details: ['Name is too short.'],
-      });
-    }
+    // Додаємо контакт до бази даних
+    const contact = await contactServices.addContact(req.body);
 
-    if (!phoneNumber) {
-      throw createHttpError(400, 'Phone number is required', {
-        details: ['Phone number is missing.'],
-      });
-    }
-
-    // ваш код для додавання контакту
+    res.status(201).json({
+      status: 201,
+      message: 'Successfully created a contact!',
+      data: contact,
+    });
   } catch (error) {
-    next(error); // передаємо помилку в errorHandler
+    next(error); // Передаємо помилку в errorHandler
   }
 };
 
