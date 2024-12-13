@@ -1,4 +1,6 @@
+// import { SORT_ORDER } from '../constants/index.js';
 import { ContactCollection } from '../db/models/Contact.js';
+// import { calculatePaginationData } from '../utils/calculatePaginationData.js';
 
 export const getContacts = () => {
   return ContactCollection.find();
