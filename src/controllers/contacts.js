@@ -57,15 +57,36 @@ export const getContactsByIdController = async (req, res, next) => {
   }
 };
 
+// export const addContactsController = async (req, res) => {
+//   const data = await contactServices.addContact(req.body);
 
-export const addContactsController = async (req, res) => {
-  const data = await contactServices.addContact(req.body);
+//   res.status(201).json({
+//     status: 201,
+//     message: 'Successfully created a contact!',
+//     data,
+//   });
+// };
+export const addContactsController = async (req, res, next) => {
+  try {
+    const { name, phoneNumber } = req.body;
 
-  res.status(201).json({
-    status: 201,
-    message: 'Successfully created a contact!',
-    data,
-  });
+    // Приклад валідації
+    if (!name || name.length < 3) {
+      throw createHttpError(400, 'Name must be at least 3 characters long', {
+        details: ['Name is too short.'],
+      });
+    }
+
+    if (!phoneNumber) {
+      throw createHttpError(400, 'Phone number is required', {
+        details: ['Phone number is missing.'],
+      });
+    }
+
+    // ваш код для додавання контакту
+  } catch (error) {
+    next(error); // передаємо помилку в errorHandler
+  }
 };
 
 export const upsertContactsController = async (req, res) => {
