@@ -69,7 +69,7 @@ export const getContactsByIdController = async (req, res, next) => {
 export const addContactsController = async (req, res, next) => {
   try {
     // Використовуємо Joi для валідації запиту
-    await createContactSchema.validateAsync(req.body); // Валідація тіла запиту
+    await createContactSchema.validateAsync(req.body, { abortEarly: false }); // abortEarly: false щоб Joi повернув усі помилки
 
     // Додаємо контакт до бази даних
     const contact = await contactServices.addContact(req.body);
@@ -80,7 +80,18 @@ export const addContactsController = async (req, res, next) => {
       data: contact,
     });
   } catch (error) {
-    next(error); // Передаємо помилку в errorHandler
+    // Якщо це помилка валідації Joi
+    if (error.isJoi) {
+      const details = error.details.map((detail) => ({
+        message: detail.message,
+        path: detail.path,
+      }));
+
+      // Створюємо помилку з додатковими даними
+      next(createHttpError(400, 'Validation Error', { details }));
+    } else {
+      next(error); // Передаємо будь-які інші помилки в errorHandler
+    }
   }
 };
 
