@@ -23,7 +23,6 @@ export const getAllContacts = async ({
     contactsQuery.where('isFavourite').equals(filter.isFavourite);
   }
 
-  // Використовуємо Promise.all для оптимізації
   const [contactsCount, contacts] = await Promise.all([
     ContactCollection.find().merge(contactsQuery).countDocuments(),
     contactsQuery
@@ -33,7 +32,6 @@ export const getAllContacts = async ({
       .exec(),
   ]);
 
-  // Розрахунок даних пагінації
   const paginationData = calculatePaginationData(contactsCount, perPage, page);
 
   return {

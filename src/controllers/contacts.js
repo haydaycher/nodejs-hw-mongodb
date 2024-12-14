@@ -55,7 +55,7 @@ export const upsertContactsController = async (req, res) => {
   const status = result.isNew ? 201 : 200;
   res.status(status).json({
     status,
-    message: 'Successfully created a contact!',
+    message: 'Successfully created or updated a contact!',
     data: result.data,
   });
 };
