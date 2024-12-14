@@ -4,6 +4,6 @@ export const errorHandler = (error, req, res, next) => {
   res.status(status).json({
     status,
     message,
-    ...(details && { errors: details }), // Додаємо деталі помилки, якщо вони є
+    ...(details && { errors: details }),
   });
 };

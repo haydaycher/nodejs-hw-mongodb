@@ -3,7 +3,6 @@ import { CONTACT_TYPE_LIST } from '../../constants/types.js';
 
 const { Schema, model } = mongoose;
 
-// Визначення полів моделі
 const contactFields = {
   name: {
     type: String,
@@ -41,28 +40,25 @@ const contactFields = {
   },
 };
 
-// Створення схеми
 const contactSchema = new Schema(contactFields, {
-  versionKey: false, // Видаляє поле __v
-  timestamps: true, // Додає createdAt та updatedAt
+  versionKey: false, 
+  timestamps: true, 
 });
 
-// Хуки в тому ж файлі
 contactSchema.post('save', (error, data, next) => {
-  error.status = 400; // Встановлюємо статус помилки
-  next(error); // Передаємо помилку далі
+  error.status = 400; 
+  next(error); 
 });
 
 contactSchema.pre('findOneAndUpdate', function (next) {
-  this.options.runValidators = true; // Увімкнути валідацію при оновленні
-  this.options.new = true; // Повернути оновлений документ
+  this.options.runValidators = true; 
+  this.options.new = true; 
   next();
 });
 
 contactSchema.post('findOneAndUpdate', (error, data, next) => {
-  error.status = 400; // Встановлюємо статус помилки
-  next(error); // Передаємо помилку далі
+  error.status = 400; 
+  next(error); 
 });
 
-// Експорт моделі
 export const ContactsCollection = model('Contact', contactSchema);

@@ -21,19 +21,16 @@ export const getContacts = async ({
     contactsQuery.where('isFavourite').equals(filter.isFavourite);
   }
 
-  // Отримуємо загальну кількість елементів
   const totalItems = await ContactsCollection.find()
     .merge(contactsQuery)
     .countDocuments();
 
-  // Отримуємо контакти для поточної сторінки
   const contacts = await contactsQuery
     .skip(skip)
     .limit(perPage)
     .sort({ [sortBy]: sortOrder })
     .exec();
 
-  // Використовуємо calculatePaginationData для отримання пагінації
   const paginationData = calculatePaginationData(totalItems, perPage, page);
 
   return {
@@ -41,7 +38,7 @@ export const getContacts = async ({
     message: 'Successfully found contacts!',
     data: {
       data: contacts,
-      ...paginationData, // Додаємо інформацію про пагінацію
+      ...paginationData,
     },
   };
 };
