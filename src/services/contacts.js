@@ -21,20 +21,28 @@ export const getContacts = async ({
     contactsQuery.where('isFavourite').equals(filter.isFavourite);
   }
 
-  const [totalCount, contacts] = await Promise.all([
-    ContactsCollection.find().merge(contactsQuery).countDocuments(),
-    contactsQuery
-      .skip(skip)
-      .limit(perPage)
-      .sort({ [sortBy]: sortOrder })
-      .exec(),
-  ]);
+  // Отримуємо загальну кількість елементів
+  const totalItems = await ContactsCollection.find()
+    .merge(contactsQuery)
+    .countDocuments();
 
-  const paginationData = calculatePaginationData({ totalCount, page, perPage });
+  // Отримуємо контакти для поточної сторінки
+  const contacts = await contactsQuery
+    .skip(skip)
+    .limit(perPage)
+    .sort({ [sortBy]: sortOrder })
+    .exec();
+
+  // Використовуємо calculatePaginationData для отримання пагінації
+  const paginationData = calculatePaginationData(totalItems, perPage, page);
 
   return {
-    data: contacts,
-    ...paginationData,
+    status: 200,
+    message: 'Successfully found contacts!',
+    data: {
+      data: contacts,
+      ...paginationData, // Додаємо інформацію про пагінацію
+    },
   };
 };
 
@@ -44,7 +52,7 @@ export const addContact = (payload) => ContactsCollection.create(payload);
 
 export const updateContact = async ({ _id, payload, options = {} }) => {
   const contact = await ContactsCollection.findById(_id);
-  if (!contact) return null; // Додана перевірка на існування
+  if (!contact) return null;
 
   const rawResult = await ContactsCollection.findOneAndUpdate(
     { _id },
@@ -65,7 +73,7 @@ export const updateContact = async ({ _id, payload, options = {} }) => {
 
 export const deleteContact = async (filter) => {
   const contact = await ContactsCollection.findOneAndDelete(filter);
-  if (!contact) return null; // Додана перевірка на існування
+  if (!contact) return null;
 
   return contact;
 };
