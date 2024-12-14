@@ -9,7 +9,7 @@
 //     next(error);
 //   }
 // };
-import createHttpError from 'http-errors';
+// import createHttpError from 'http-errors';
 
 export const validateBody = (schema) => async (req, res, next) => {
   try {
@@ -22,8 +22,12 @@ export const validateBody = (schema) => async (req, res, next) => {
         message: detail.message,
         path: detail.path,
       }));
-      const error = createHttpError(400, 'Bad Request', { details });
-      next(error);
+      // Надсилаємо відповідь з помилкою і деталями
+      return res.status(400).json({
+        status: 400,
+        message: 'Bad Request',
+        errors: details, // Повертаємо більш детальну інформацію
+      });
     } else {
       next(err); // Для інших помилок
     }
