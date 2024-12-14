@@ -65,4 +65,4 @@ contactSchema.post('findOneAndUpdate', (error, data, next) => {
 });
 
 // Експорт моделі
-export const ContactCollection = model('Contact', contactSchema);
+export const ContactsCollection = model('Contact', contactSchema);
