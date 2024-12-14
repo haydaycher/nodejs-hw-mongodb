@@ -1,4 +1,4 @@
-import { SORT_ORDER } from '../constants';
+import { SORT_ORDER } from '../constants/index.js';
 const parseSortBy = (value) => {
   if (typeof value !== 'string') {
     return '_id';
