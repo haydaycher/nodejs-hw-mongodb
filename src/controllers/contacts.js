@@ -3,23 +3,28 @@ import createHttpError from 'http-errors';
 import * as contactServices from '../services/contacts.js';
 
 import { parsePaginationParams } from '../utils/parsePaginationParams.js';
-import { sortByList } from '../db/models/Contact.js';
+// Замінили sortByList на CONTACT_SORT_FIELDS
+import { CONTACT_SORT_FIELDS } from '../constants/sort.js';
 import { parseSortParams } from '../utils/parseSortParams.js';
 import { parseFilterParams } from '../utils/parseFilterParams.js';
 
 export const getContactsController = async (req, res) => {
   const { page, perPage } = parsePaginationParams(req.query);
-  const { sortBy, sortOrder } = parseSortParams(req.query, sortByList);
+  // Використовуємо CONTACT_SORT_FIELDS для сортування
+  const { sortBy, sortOrder } = parseSortParams(req.query, CONTACT_SORT_FIELDS);
   const filter = parseFilterParams(req.query);
-  console.log(filter);
+
+  // Перевірка, чи є фільтри перед передачею їх у запит
+  const filters = Object.keys(filter).length ? filter : undefined;
 
   const data = await contactServices.getContacts({
     page,
     perPage,
     sortBy,
     sortOrder,
-    filter,
+    filter: filters,
   });
+
   res.json({
     status: 200,
     message: 'Successfully found contacts!',

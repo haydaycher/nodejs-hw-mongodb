@@ -1,4 +1,4 @@
-import ContactCollection from '../db/models/Contact.js';
+import { ContactCollection } from '../db/models/Contact.js';
 
 import { calculatePaginationData } from '../utils/calculatePaginationData.js';
 
@@ -20,14 +20,12 @@ export const getContacts = async ({
     contactsQuery.where('isFavourite').equals(filter.isFavourite);
   }
 
-  const [totalItems, data] = await Promise.all([
-    ContactCollection.find().merge(contactsQuery).countDocuments(),
-    contactsQuery
-      .skip(skip)
-      .limit(perPage)
-      .sort({ [sortBy]: sortOrder })
-      .exec(),
-  ]);
+  const totalItems = await ContactCollection.countDocuments({ ...filter });
+  const data = await contactsQuery
+    .skip(skip)
+    .limit(perPage)
+    .sort({ [sortBy]: sortOrder })
+    .exec();
 
   const paginationData = calculatePaginationData({ totalItems, page, perPage });
 
@@ -37,11 +35,15 @@ export const getContacts = async ({
   };
 };
 
+
 export const getContactById = (id) => ContactCollection.findById(id);
 
 export const addContact = (payload) => ContactCollection.create(payload);
 
 export const updateContact = async ({ _id, payload, options = {} }) => {
+  const contact = await ContactCollection.findById(_id);
+  if (!contact) return null; // Додана перевірка на існування
+
   const rawResult = await ContactCollection.findOneAndUpdate({ _id }, payload, {
     ...options,
     includeResultMetadata: true,
@@ -55,5 +57,9 @@ export const updateContact = async ({ _id, payload, options = {} }) => {
   };
 };
 
-export const deleteContact = (filter) =>
-  ContactCollection.findOneAndDelete(filter);
+export const deleteContact = async (filter) => {
+  const contact = await ContactCollection.findOneAndDelete(filter);
+  if (!contact) return null; // Додана перевірка на існування
+
+  return contact;
+};
