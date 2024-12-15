@@ -16,19 +16,31 @@ export const getContactsController = async (req, res, next) => {
 
     const filters = Object.keys(filter).length ? filter : undefined;
 
-    const data = await contactServices.getContacts({
-      page,
-      perPage,
-      sortBy,
-      sortOrder,
-      filter: filters,
-    });
+    // Отримуємо дані з сервісу
+    const { data: contacts, ...pagination } = await contactServices.getContacts(
+      {
+        page,
+        perPage,
+        sortBy,
+        sortOrder,
+        filter: filters,
+      },
+    );
 
-    res.json({ data });
+    // Формуємо відповідь
+    res.json({
+      status: 200,
+      message: 'Successfully found contacts!',
+      data: {
+        data: contacts, // Масив контактів
+        ...pagination, // Параметри пагінації
+      },
+    });
   } catch (err) {
     next(err);
   }
 };
+
 
 export const getContactsByIdController = async (req, res, next) => {
   const { id } = req.params;
