@@ -41,24 +41,24 @@ const contactFields = {
 };
 
 const contactSchema = new Schema(contactFields, {
-  versionKey: false, 
-  timestamps: true, 
+  versionKey: false,
+  timestamps: true,
 });
 
 contactSchema.post('save', (error, data, next) => {
-  error.status = 400; 
-  next(error); 
+  error.status = 400;
+  next(error);
 });
 
 contactSchema.pre('findOneAndUpdate', function (next) {
-  this.options.runValidators = true; 
-  this.options.new = true; 
+  this.options.runValidators = true;
+  this.options.new = true;
   next();
 });
 
 contactSchema.post('findOneAndUpdate', (error, data, next) => {
-  error.status = 400; 
-  next(error); 
+  error.status = 400;
+  next(error);
 });
 
 export const ContactsCollection = model('Contact', contactSchema);

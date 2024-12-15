@@ -24,13 +24,9 @@ export const getContactsController = async (req, res, next) => {
       filter: filters,
     });
 
-    res.json({
-      status: 200,
-      message: 'Successfully found contacts!',
-      data,
-    });
+    res.json({ data });
   } catch (err) {
-    next(err); 
+    next(err);
   }
 };
 
@@ -50,7 +46,7 @@ export const getContactsByIdController = async (req, res, next) => {
       data,
     });
   } catch (err) {
-    next(err); 
+    next(err);
   }
 };
 
@@ -64,7 +60,7 @@ export const addContactsController = async (req, res, next) => {
       data,
     });
   } catch (err) {
-    next(err); 
+    next(err);
   }
 };
 
@@ -85,7 +81,7 @@ export const upsertContactsController = async (req, res, next) => {
       data: result.data,
     });
   } catch (err) {
-    next(err); 
+    next(err);
   }
 };
 
@@ -108,7 +104,7 @@ export const patchContactsController = async (req, res, next) => {
       data: result.data,
     });
   } catch (err) {
-    next(err); 
+    next(err);
   }
 };
 
@@ -124,6 +120,6 @@ export const deleteContactsController = async (req, res, next) => {
 
     res.status(204).send();
   } catch (err) {
-    next(err); 
+    next(err);
   }
 };
