@@ -21,7 +21,7 @@ export const getContacts = async ({
     contactsQuery.where('isFavourite').equals(filter.isFavourite);
   }
 
-  const totalItems = await ContactsCollection.find()
+  const totalItems = await ContactsCollection.find({ userId })
     .merge(contactsQuery)
     .countDocuments();
 
@@ -36,41 +36,23 @@ export const getContacts = async ({
   return {
     status: 200,
     message: 'Successfully found contacts!',
-    data: {
-      data: contacts,
-      ...paginationData,
-    },
+    data: contacts,
+    pagination: paginationData,
   };
 };
 
-export const getContactById = (id) => ContactsCollection.findById(id);
+export const getContactById = async (id, userId) => {
+  return await ContactsCollection.findOne({ _id: id, userId }).exec();
+};
 
 export const addContact = (payload) => ContactsCollection.create(payload);
 
-export const updateContact = async ({ _id, payload, options = {} }) => {
-  const contact = await ContactsCollection.findById(_id);
-  if (!contact) return null;
-
-  const rawResult = await ContactsCollection.findOneAndUpdate(
-    { _id },
-    payload,
-    {
-      ...options,
-      includeResultMetadata: true,
-    },
-  );
-
-  if (!rawResult || !rawResult.value) return null;
-
-  return {
-    data: rawResult.value,
-    isNew: Boolean(rawResult.lastErrorObject.upserted),
-  };
+export const updateContact = async ({ _id, userId, payload }) => {
+  return await ContactsCollection.findOneAndUpdate({ _id, userId }, payload, {
+    new: true,
+  }).exec();
 };
 
-export const deleteContact = async (filter) => {
-  const contact = await ContactsCollection.findOneAndDelete(filter);
-  if (!contact) return null;
-
-  return contact;
+export const deleteContact = async ({ _id, userId }) => {
+  return await ContactsCollection.findOneAndDelete({ _id, userId }).exec();
 };

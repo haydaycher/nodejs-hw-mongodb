@@ -1,12 +1,9 @@
 import mongoose from 'mongoose';
 
-const { Schema, model } = mongoose;
-
-const sessionSchema = new Schema(
+const sessionSchema = new mongoose.Schema(
   {
     userId: {
-      type: Schema.Types.ObjectId,
-      ref: 'User', // Референс до колекції `User`
+      type: mongoose.Schema.Types.ObjectId,
       required: [true, 'User ID is required'],
     },
     accessToken: {
@@ -27,9 +24,11 @@ const sessionSchema = new Schema(
     },
   },
   {
-    timestamps: true, // Автоматичне додавання createdAt і updatedAt
+    timestamps: true, 
     versionKey: false,
   },
 );
 
-export const Session = model('Session', sessionSchema);
+const Session = mongoose.model('Session', sessionSchema);
+
+export { Session };
