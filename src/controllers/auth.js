@@ -5,14 +5,12 @@ import {
   refreshUserSession,
 } from '../services/auth.js';
 
-
 export async function registerController(req, res) {
   const { name, email, password } = req.body;
 
-  
   if (!name || !email || !password) {
     return res.status(400).json({
-      status: 'error',
+      status: 400,
       message: 'All fields (name, email, password) are required!',
     });
   }
@@ -21,7 +19,7 @@ export async function registerController(req, res) {
     const registeredUser = await registerUser({ name, email, password });
 
     res.status(201).send({
-      status: 'success',
+      status: 201,
       message: 'Successfully registered a user!',
       data: {
         id: registeredUser._id,
@@ -32,21 +30,19 @@ export async function registerController(req, res) {
     });
   } catch (err) {
     res.status(500).send({
-      status: 'error',
+      status: 500,
       message: 'Error registering user',
       error: err.message,
     });
   }
 }
 
-
 export const loginController = async (req, res, next) => {
   const { email, password } = req.body;
 
-  
   if (!email || !password) {
     return res.status(400).json({
-      status: 'error',
+      status: 400,
       message: 'Email and password are required',
     });
   }
@@ -54,7 +50,6 @@ export const loginController = async (req, res, next) => {
   try {
     const session = await loginUser(email, password);
 
-    
     res.cookie('refreshToken', session.refreshToken, {
       httpOnly: true,
       expires: session.refreshTokenValidUntil,
@@ -64,16 +59,15 @@ export const loginController = async (req, res, next) => {
       expires: session.refreshTokenValidUntil,
     });
 
-    
     res.status(200).send({
-      status: 'success',
+      status: 200,
       message: 'Successfully logged in!',
       data: {
         accessToken: session.accessToken,
       },
     });
   } catch (err) {
-    next(err); 
+    next(err);
   }
 };
 

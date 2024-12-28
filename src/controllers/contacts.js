@@ -79,7 +79,11 @@ export const upsertContactsController = async (req, res, next) => {
   try {
     const result = await contactServices.updateContact({
       _id,
-      payload: req.body,
+      payload: {
+        ...req.body,
+        userId: req.user._id,
+      },
+      userId: req.user._id,
       options: { upsert: true },
     });
 
@@ -87,7 +91,7 @@ export const upsertContactsController = async (req, res, next) => {
     res.status(status).json({
       status,
       message: 'Successfully created a contact!',
-      data: result.data,
+      data: result,
     });
   } catch (err) {
     next(err);
@@ -111,7 +115,7 @@ export const patchContactsController = async (req, res, next) => {
     res.json({
       status: 200,
       message: 'Successfully patched a contact!',
-      data: result.data,
+      data: result,
     });
   } catch (err) {
     next(err);

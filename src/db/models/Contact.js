@@ -21,7 +21,6 @@ const contactFields = {
   },
   email: {
     type: String,
-    required: [true, 'Email is required'],
     lowercase: true,
     match: [/^\S+@\S+\.\S+$/, 'Please provide a valid email address'],
   },
@@ -36,6 +35,7 @@ const contactFields = {
       message:
         'Contact type must be one of the following: work, home, personal',
     },
+    required: true,
     default: 'personal',
   },
   userId: {
