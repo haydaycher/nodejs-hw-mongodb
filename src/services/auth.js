@@ -1,10 +1,23 @@
+import * as fs from 'node:fs';
+import path from 'node:path';
+
 import crypto from 'node:crypto';
 import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
+import handlebars from 'handlebars';
+
 import createHttpError from 'http-errors';
 import { User } from '../db/models/user.js';
 import { Session } from '../db/models/session.js';
 
-const SESSION_EXPIRATION_TIME = 15 * 60 * 1000; // 15 хвилин
+import { sendMail } from '../utils/sendMail.js';
+
+const RESET_PASSWORD_TEMPLATE = fs.readFileSync(
+  path.resolve('src/templates/reset-password.hbs'),
+  { encoding: 'UTF-8' },
+);
+// =================!!!!!!!!!!!!!!!!!!!!!ЗМІНИТИ ЧАС 180 НА 15!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+const SESSION_EXPIRATION_TIME = 180 * 60 * 1000; // 15 хвилин
 const REFRESH_TOKEN_EXPIRATION_TIME = 30 * 24 * 60 * 60 * 1000; // 30 днів
 
 export const registerUser = async (payload) => {
@@ -74,4 +87,86 @@ export const refreshUserSession = async ({ sessionId, refreshToken }) => {
       Date.now() + REFRESH_TOKEN_EXPIRATION_TIME,
     ),
   });
+};
+
+export async function requestResetPassword(email) {
+  const user = await User.findOne({ email });
+
+  if (user === null) {
+    throw createHttpError(404, 'User not found');
+  }
+
+  const resetToken = jwt.sign(
+    {
+      sub: user._id,
+      email: user.email,
+    },
+    process.env.JWT_SECRET,
+    {
+      expiresIn: '5m',
+    },
+  );
+
+  const html = handlebars.compile(RESET_PASSWORD_TEMPLATE);
+
+  await sendMail({
+    from: 'chtozalogin.jh@gmail.com',
+    to: user.email,
+    subject: 'Reset your password',
+    html: html({ resetToken: resetToken, APP_DOMAIN: process.env.APP_DOMAIN }),
+  });
+}
+// const resetToken = jwt.sign({ email: user.email }, process.env.JWT_SECRET, {
+//   expiresIn: '5m',
+// });
+
+// const frontendDomain = process.env.APP_DOMAIN || 'http://localhost:3000'; // за замовчуванням
+// await sendMail({
+//   from: process.env.SMTP_FROM,
+//   to: user.email,
+//   subject: 'Reset your password',
+//   html: `<p>To reset your password please visit this <a href="${frontendDomain}/reset-password?token=${resetToken}">link</a></p>`,
+// });
+
+// export async function resetPassword(newPassword, token) {
+//   try {
+//     const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+//     console.log(decoded);
+//   } catch (error) {
+//     console.log(error.name);
+//     if (
+//       error.name === 'JsonWebTokenError' ||
+//       error.name === 'TokenExpiredError'
+//     ) {
+//       throw createHttpError(401, 'Token is expired or invalid.');
+//     }
+
+//     throw error;
+//   }
+// }
+export const resetPassword = async (payload) => {
+  let decoded;
+
+  try {
+    decoded = jwt.verify(payload.token, process.env.JWT_SECRET);
+  } catch (error) {
+    if (
+      error.name === 'JsonWebTokenError' ||
+      error.name === 'TokenExpiredError'
+    ) {
+      throw createHttpError(401, 'Token is expired or invalid.');
+    }
+    throw error;
+  }
+
+  const user = await User.findOne({ _id: decoded.sub, email: decoded.email });
+
+  if (!user) {
+    throw createHttpError(404, 'User not found!');
+  }
+
+  const hashedPassword = await bcrypt.hash(payload.password, 10);
+
+  await User.updateOne({ _id: user._id }, { password: hashedPassword });
 };

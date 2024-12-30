@@ -33,7 +33,7 @@ export const authenticate = async (req, res, next) => {
     }
 
     req.user = user;
-    // req.user = { id: user._id, name: user.name };
+
     next();
   } catch (err) {
     next(err);

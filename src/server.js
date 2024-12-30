@@ -1,3 +1,4 @@
+import path from 'node:path';
 import express from 'express';
 import cors from 'cors';
 import { env } from '../src/utils/env.js';
@@ -10,6 +11,8 @@ import cookieParser from 'cookie-parser';
 
 export const setupServer = () => {
   const app = express();
+
+  app.use('/photos', express.static(path.resolve('src/public/photos')));
 
   app.use(cors());
   app.use(cookieParser());

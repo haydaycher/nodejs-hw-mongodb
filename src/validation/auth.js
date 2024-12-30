@@ -34,16 +34,16 @@ export const registerContactSchema = Joi.object({
   }),
 });
 
-// export const loginSchema = Joi.object({
-//   email: Joi.string().email().required().messages({
-//     'string.empty': '"email" is required',
-//     'string.email': '"email" must be a valid email',
-//   }),
-//   password: Joi.string().required().messages({
-//     'string.empty': '"password" is required',
-//   }),
-// });
 export const loginSchema = Joi.object({
   email: Joi.string().email().required(),
   password: Joi.string().required(),
+});
+// =====================================================
+export const requestResetPasswordSchema = Joi.object({
+  email: Joi.string().email().required(),
+});
+
+export const resetPasswordSchema = Joi.object({
+  password: Joi.string().required(),
+  token: Joi.string().required(),
 });

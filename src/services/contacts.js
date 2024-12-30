@@ -31,13 +31,13 @@ export const getContacts = async ({
     .sort({ [sortBy]: sortOrder })
     .exec();
 
-  const paginationData = calculatePaginationData(totalItems, perPage, page);
+  const paginationData = calculatePaginationData(totalItems, page, perPage);
 
   return {
     status: 200,
     message: 'Successfully found contacts!',
     data: contacts,
-    pagination: paginationData,
+    ...paginationData,
   };
 };
 

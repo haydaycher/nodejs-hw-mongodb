@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import * as contactsControllers from '../controllers/contacts.js';
 import { isValidId } from '../middlewares/isValidId.js';
-
+import { upload } from '../middlewares/upload.js';
 import ctrlWrapper from '../utils/ctrlWrapper.js';
 import { validateBody } from '../middlewares/validateBody.js';
 import { createContactSchema } from '../validation/contacts.js';
@@ -21,6 +21,7 @@ contactsRouter.get(
 
 contactsRouter.post(
   '/',
+  upload.single('photo'),
   validateBody(createContactSchema),
   ctrlWrapper(contactsControllers.addContactsController),
 );

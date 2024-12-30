@@ -43,6 +43,7 @@ const contactFields = {
     ref: 'User',
     required: true,
   },
+  photo: { type: String, default: null },
 };
 
 const contactSchema = new Schema(contactFields, {
