@@ -36,8 +36,10 @@ export const getContacts = async ({
   return {
     status: 200,
     message: 'Successfully found contacts!',
-    data: contacts,
-    ...paginationData,
+    data: {
+      data: contacts, // Список контактів обгорнуто в `data`
+      ...paginationData, // Додано дані пагінації
+    },
   };
 };
 
