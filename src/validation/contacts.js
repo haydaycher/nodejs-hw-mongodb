@@ -32,27 +32,10 @@ export const createContactSchema = Joi.object({
   'any.required': 'Please fill in all required fields.',
 });
 
-
 export const updateContactSchema = Joi.object({
-  name: Joi.string().min(3).max(20).messages({
-    'string.base': 'Name must be a string',
-    'string.min': 'Name should have at least 3 characters',
-    'string.max': 'Name should have at most 20 characters',
-  }),
-  phoneNumber: Joi.string().min(3).max(20).trim().messages({
-    'string.base': 'Phone number must be a string',
-    'string.min': 'Phone number should have at least 3 characters',
-    'string.max': 'Phone number should have at most 20 characters',
-  }),
-  email: Joi.string().email().messages({
-    'string.base': 'Email must be a string',
-    'string.email': 'Email must be in the format *@*.*',
-  }),
-  isFavourite: Joi.boolean().messages({
-    'boolean.base': 'IsFavourite must be a boolean value',
-  }),
-  contactType: Joi.string().valid('work', 'home', 'personal').messages({
-    'string.base': 'Contact type must be a string',
-    'any.only': "Contact type must be one of 'work', 'home', or 'personal'",
-  }),
-}).or('name', 'phoneNumber', 'email', 'isFavourite', 'contactType');
+  name: Joi.string().min(3).max(20),
+  phoneNumber: Joi.string().min(3).max(20),
+  email: Joi.string().email(),
+  isFavourite: Joi.boolean(),
+  contactType: Joi.string().valid('work', 'home', 'personal'),
+});

@@ -63,8 +63,12 @@ contactSchema.pre('findOneAndUpdate', function (next) {
 });
 
 contactSchema.post('findOneAndUpdate', (error, data, next) => {
-  error.status = 400;
-  next(error);
+  if (error) {
+    error.status = 400;
+    next(error);
+  } else {
+    next();
+  }
 });
 
 export const ContactsCollection = model('Contact', contactSchema);

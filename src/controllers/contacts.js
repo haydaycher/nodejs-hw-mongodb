@@ -121,11 +121,49 @@ export const upsertContactsController = async (req, res, next) => {
 
 export const patchContactsController = async (req, res, next) => {
   const { id: _id } = req.params;
+  const { file } = req;
+
+  let photo = null;
+
+  if (file) {
+    try {
+      if (process.env.ENABLE_CLOUDINARY === 'true') {
+        const result = await uploadToCloudinary(file.path); // Завантаження на Cloudinary
+        await fs.unlink(file.path);
+
+        photo = result.secure_url;
+      } else {
+        const photoPath = path.resolve(
+          'src',
+          'public',
+          'photos',
+          file.filename,
+        );
+        await fs.rename(file.path, photoPath);
+
+        photo = `http://localhost:3001/photos/${file.filename}`;
+      }
+    } catch (err) {
+      console.error(err);
+      return next(createHttpError(500, 'Error uploading photo'));
+    }
+  } else {
+    const existingContact = await contactServices.getContactById(
+      _id,
+      req.user._id,
+    );
+    if (existingContact && existingContact.photo) {
+      photo = existingContact.photo;
+    }
+  }
 
   try {
     const result = await contactServices.updateContact({
       _id,
-      payload: req.body,
+      payload: {
+        ...req.body,
+        photo,
+      },
       userId: req.user._id,
     });
 
@@ -135,7 +173,7 @@ export const patchContactsController = async (req, res, next) => {
 
     res.json({
       status: 200,
-      message: 'Successfully patched a contact!',
+      message: 'Successfully patched the contact!',
       data: result,
     });
   } catch (err) {

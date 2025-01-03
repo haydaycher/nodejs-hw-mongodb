@@ -26,18 +26,19 @@ contactsRouter.post(
   ctrlWrapper(contactsControllers.addContactsController),
 );
 
+contactsRouter.patch(
+  '/:id',
+  isValidId,
+  upload.single('photo'),
+  validateBody(updateContactSchema),
+  ctrlWrapper(contactsControllers.patchContactsController),
+);
+
 contactsRouter.put(
   '/:id',
   isValidId,
   validateBody(createContactSchema),
   ctrlWrapper(contactsControllers.upsertContactsController),
-);
-
-contactsRouter.patch(
-  '/:id',
-  isValidId,
-  validateBody(updateContactSchema),
-  ctrlWrapper(contactsControllers.patchContactsController),
 );
 
 contactsRouter.delete(

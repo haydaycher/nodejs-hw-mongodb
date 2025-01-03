@@ -16,8 +16,8 @@ const RESET_PASSWORD_TEMPLATE = fs.readFileSync(
   path.resolve('src/templates/reset-password.hbs'),
   { encoding: 'UTF-8' },
 );
-// =================!!!!!!!!!!!!!!!!!!!!!ЗМІНИТИ ЧАС 180 НА 15!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-const SESSION_EXPIRATION_TIME = 180 * 60 * 1000; // 15 хвилин
+// =================!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+const SESSION_EXPIRATION_TIME = 15 * 60 * 1000; // 15 хвилин
 const REFRESH_TOKEN_EXPIRATION_TIME = 30 * 24 * 60 * 60 * 1000; // 30 днів
 
 export const registerUser = async (payload) => {
@@ -116,40 +116,12 @@ export async function requestResetPassword(email) {
     html: html({ resetToken: resetToken, APP_DOMAIN: process.env.APP_DOMAIN }),
   });
 }
-// const resetToken = jwt.sign({ email: user.email }, process.env.JWT_SECRET, {
-//   expiresIn: '5m',
-// });
 
-// const frontendDomain = process.env.APP_DOMAIN || 'http://localhost:3000'; // за замовчуванням
-// await sendMail({
-//   from: process.env.SMTP_FROM,
-//   to: user.email,
-//   subject: 'Reset your password',
-//   html: `<p>To reset your password please visit this <a href="${frontendDomain}/reset-password?token=${resetToken}">link</a></p>`,
-// });
-
-// export async function resetPassword(newPassword, token) {
-//   try {
-//     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
-//     console.log(decoded);
-//   } catch (error) {
-//     console.log(error.name);
-//     if (
-//       error.name === 'JsonWebTokenError' ||
-//       error.name === 'TokenExpiredError'
-//     ) {
-//       throw createHttpError(401, 'Token is expired or invalid.');
-//     }
-
-//     throw error;
-//   }
-// }
 export const resetPassword = async (payload) => {
-  let decoded;
+  let entries;
 
   try {
-    decoded = jwt.verify(payload.token, process.env.JWT_SECRET);
+    entries = jwt.verify(payload.token, process.env.JWT_SECRET);
   } catch (error) {
     if (
       error.name === 'JsonWebTokenError' ||
@@ -160,13 +132,16 @@ export const resetPassword = async (payload) => {
     throw error;
   }
 
-  const user = await User.findOne({ _id: decoded.sub, email: decoded.email });
+  const user = await User.findOne({
+    email: entries.email,
+    _id: entries.sub,
+  });
 
   if (!user) {
     throw createHttpError(404, 'User not found!');
   }
 
-  const hashedPassword = await bcrypt.hash(payload.password, 10);
+  const encryptedPassword = await bcrypt.hash(payload.password, 10);
 
-  await User.updateOne({ _id: user._id }, { password: hashedPassword });
+  await User.updateOne({ _id: user._id }, { password: encryptedPassword });
 };

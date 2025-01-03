@@ -107,7 +107,7 @@ export const refreshController = async (req, res) => {
     },
   });
 };
-
+// ========================================================================
 export async function requestResetPasswordController(req, res) {
   const { email } = req.body;
 
@@ -119,14 +119,25 @@ export async function requestResetPasswordController(req, res) {
     data: {},
   });
 }
+export const resetPasswordController = async (req, res, next) => {
+  const { token, password } = req.body;
 
-export async function resetPasswordController(req, res) {
-  const { password, token } = req.body;
+  if (!token || !password) {
+    return res.status(400).json({
+      status: 400,
+      message: 'Token and new password are required.',
+    });
+  }
 
-  await resetPassword(password, token);
-  res.send({
-    status: 200,
-    message: 'Password has been successfully reset.',
-    data: {},
-  });
-}
+  try {
+    await resetPassword({ token, password });
+
+    res.status(200).send({
+      status: 200,
+      message: 'Password has been successfully reset.',
+      data: {},
+    });
+  } catch (err) {
+    next(err); 
+  }
+};
