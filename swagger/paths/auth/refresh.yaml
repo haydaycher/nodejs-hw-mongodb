@@ -1,0 +1,33 @@
+tags:
+  - Auth
+summary: Refresh the user session
+operationId: refreshSession
+description: >
+  This endpoint refreshes the user's session by validating their refresh token.
+  A new access token and refresh token are returned.
+security:
+  - bearerAuth: []
+responses:
+  '200':
+    description: Successfully refreshed the session.
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            status:
+              type: integer
+              example: 200
+            message:
+              type: string
+              example: 'Successfully refreshed a session!'
+            data:
+              type: object
+              properties:
+                accessToken:
+                  type: string
+                  example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'
+  '401':
+    $ref: ../../components/responses/401.yaml
+  '500':
+    $ref: ../../components/responses/500.yaml

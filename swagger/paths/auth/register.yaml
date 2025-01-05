@@ -1,0 +1,57 @@
+tags:
+  - Auth
+summary: Register a new user
+operationId: registerUser
+description: >
+  This endpoint registers a new user by providing a name, email, and password.
+security: []
+requestBody:
+  required: true
+  content:
+    application/json:
+      schema:
+        type: object
+        properties:
+          name:
+            type: string
+            example: 'John Doe'
+          email:
+            type: string
+            example: 'johndoe@example.com'
+          password:
+            type: string
+            example: 'Password123!'
+responses:
+  '201':
+    description: Successfully registered a user.
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            status:
+              type: integer
+              example: 201
+            message:
+              type: string
+              example: 'Successfully registered a user.'
+            data:
+              type: object
+              properties:
+                id:
+                  type: string
+                  example: '60d0fe4f5311236168a109ca'
+                name:
+                  type: string
+                  example: 'John Doe'
+                email:
+                  type: string
+                  example: 'johndoe@example.com'
+                createdAt:
+                  type: string
+                  format: date-time
+                  example: '2025-01-01T12:00:00Z'
+  '400':
+    $ref: '../../components/responses/400.yaml'
+  '500':
+    $ref: '../../components/responses/500.yaml'

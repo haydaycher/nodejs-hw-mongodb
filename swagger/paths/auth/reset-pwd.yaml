@@ -1,0 +1,41 @@
+tags:
+  - Auth
+summary: Reset a user's password
+operationId: resetPassword
+description: >
+  This endpoint resets a user's password using a secure token sent to their email.
+security: []
+requestBody:
+  required: true
+  content:
+    application/json:
+      schema:
+        type: object
+        properties:
+          token:
+            type: string
+            example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+          password:
+            type: string
+            example: "NewPassword123!"
+responses:
+  '200':
+    description: Successfully reset the password.
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            status:
+              type: integer
+              example: 200
+            message:
+              type: string
+              example: "Password has been successfully reset."
+  '400':
+    $ref: ../../components/responses/400.yaml
+  '401':
+    $ref: ../../components/responses/401.yaml
+  '500':
+    $ref: ../../components/responses/500.yaml
+

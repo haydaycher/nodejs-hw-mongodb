@@ -16,14 +16,14 @@ const RESET_PASSWORD_TEMPLATE = fs.readFileSync(
   path.resolve('src/templates/reset-password.hbs'),
   { encoding: 'UTF-8' },
 );
-// =================!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+//===!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!====
 const SESSION_EXPIRATION_TIME = 15 * 60 * 1000; // 15 хвилин
 const REFRESH_TOKEN_EXPIRATION_TIME = 30 * 24 * 60 * 60 * 1000; // 30 днів
 
 export const registerUser = async (payload) => {
   const user = await User.findOne({ email: payload.email });
   if (user) {
-    throw createHttpError(409, 'Email in use');
+    throw createHttpError(400, 'Email in use');
   }
 
   payload.password = await bcrypt.hash(payload.password, 10);
@@ -145,3 +145,43 @@ export const resetPassword = async (payload) => {
 
   await User.updateOne({ _id: user._id }, { password: encryptedPassword });
 };
+// ===============================================
+export async function loginOrRegister(payload) {
+  console.log(payload);
+  const user = await User.findOne({ email: payload.email });
+
+  if (user === null) {
+    const password = await bcrypt.hash(
+      crypto.randomBytes(10).toString('base64'),
+      10,
+    );
+
+    const createdUser = await User.create({
+      name: payload.name,
+      email: payload.email,
+      password,
+    });
+
+    return await Session.create({
+      userId: createdUser._id,
+      accessToken: crypto.randomBytes(30).toString('base64'),
+      refreshToken: crypto.randomBytes(30).toString('base64'),
+      accessTokenValidUntil: new Date(Date.now() + SESSION_EXPIRATION_TIME),
+      refreshTokenValidUntil: new Date(
+        Date.now() + REFRESH_TOKEN_EXPIRATION_TIME,
+      ),
+    });
+  }
+
+  await Session.deleteOne({ userId: user._id });
+
+  return await Session.create({
+    userId: user._id,
+    accessToken: crypto.randomBytes(30).toString('base64'),
+    refreshToken: crypto.randomBytes(30).toString('base64'),
+    accessTokenValidUntil: new Date(Date.now() + SESSION_EXPIRATION_TIME),
+    refreshTokenValidUntil: new Date(
+      Date.now() + REFRESH_TOKEN_EXPIRATION_TIME,
+    ),
+  });
+}

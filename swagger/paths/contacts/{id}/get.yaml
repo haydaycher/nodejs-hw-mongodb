@@ -1,0 +1,43 @@
+tags:
+  - Contacts
+summary: Get a contact by ID
+operationId: getContactById
+description: >
+  This endpoint retrieves a specific contact by its ID.
+  The contact must belong to the authenticated user.
+security:
+  - bearerAuth: []
+parameters:
+  - in: path
+    name: id
+    required: true
+    schema:
+      type: string
+      example: "60d0fe4f5311236168a109ca"
+    description: The ID of the contact to retrieve.
+responses:
+  '200':
+    description: Successfully retrieved the contact.
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            status:
+              type: integer
+              example: 200
+            message:
+              type: string
+              example: "Successfully found contact with id 60d0fe4f5311236168a109ca!"
+            data:
+              $ref: '../../../components/schemas/contact.yaml'
+  '401':
+    $ref: ../../../components/responses/401.yaml
+  '404':
+    description: Contact not found.
+    content:
+      application/json:
+        schema:
+          $ref: ../../../components/responses/404.yaml
+  '500':
+    $ref: ../../../components/responses/500.yaml

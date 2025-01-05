@@ -1,0 +1,28 @@
+type: object
+required:
+  - userId
+  - accessToken
+  - refreshToken
+  - accessTokenValidUntil
+  - refreshTokenValidUntil
+properties:
+  userId:
+    description: "User's session id"
+    type: string
+    example: '65e4decdd286b30065d54af9'
+  accessToken:
+    description: 'Access Token'
+    type: string
+    example: '0nEt+68+wc+SMaHWgff4AXESq6H89ORy1HX85/mN'
+  refreshToken:
+    description: 'Refresh Token'
+    type: string
+    example: '0nEt+68+wc+SMaHWgff4AXESq6H89ORy1HX85/mN'
+  accessTokenValidUntil:
+    description: 'accessTokenValidUntil'
+    type: number
+    example: 2024-12-20T20:31:34.436+00:00
+  refreshTokenValidUntil:
+    description: 'refreshTokenValidUntil'
+    type: number
+    example: 2024-12-20T20:31:34.436+00:00

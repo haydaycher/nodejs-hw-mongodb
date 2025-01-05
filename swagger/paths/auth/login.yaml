@@ -1,0 +1,51 @@
+tags:
+  - Auth
+summary: Log in a user
+operationId: loginUser
+description: >
+  This endpoint logs in a user by validating their email and password.
+  On success, it provides an access token and sets cookies for session management.
+security: []
+requestBody:
+  required: true
+  content:
+    application/json:
+      schema:
+        type: object
+        properties:
+          email:
+            type: string
+            example: 'johndoe@example.com'
+          password:
+            type: string
+            example: 'Password123!'
+responses:
+  '200':
+    description: Successfully logged in.
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            status:
+              type: integer
+              example: 200
+            message:
+              type: string
+              example: 'Successfully logged in!'
+            data:
+              type: object
+              properties:
+                accessToken:
+                  type: string
+                  example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'
+  '400':
+    $ref: ../../components/responses/400.yaml
+  '401':
+    description: Unauthorized. Invalid email or password.
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/responses/401.yaml
+  '500':
+    $ref: ../../components/responses/500.yaml
