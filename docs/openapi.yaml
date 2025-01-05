@@ -15,7 +15,7 @@ tags:
     description: Endpoints for user authentication and authorization.
 servers:
   - url: http://localhost:3001
-  # - url: #посилання на задеплоєний сайт
+  - url: https://contactapp-a9h6.onrender.com
 paths:
   /contacts:
     get:
