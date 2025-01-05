@@ -12,6 +12,9 @@
   "servers": [
     {
       "url": "http://localhost:3001"
+    },
+    {
+      "url": "https://contactapp-a9h6.onrender.com"
     }
   ],
   "tags": [
