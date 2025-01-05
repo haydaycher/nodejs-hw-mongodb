@@ -7,6 +7,8 @@ import {
   refreshController,
   requestResetPasswordController,
   resetPasswordController,
+  getOAuthURLController,
+  confirmOauthController,
 } from '../controllers/auth.js';
 
 import { validateBody } from '../middlewares/validateBody.js';
@@ -16,7 +18,9 @@ import {
   loginSchema,
   requestResetPasswordSchema,
   resetPasswordSchema,
+  confirmOauthSchema,
 } from '../validation/auth.js';
+// import { generateOAuthURL } from '../utils/googleOAuth2.js';
 
 const router = express.Router();
 
@@ -38,7 +42,7 @@ router.post(
 router.post('/logout', ctrlWrapper(logoutController));
 
 router.post('/refresh', ctrlWrapper(refreshController));
-// ============================================
+
 router.post(
   '/send-reset-email',
   jsonParser,
@@ -51,6 +55,15 @@ router.post(
   jsonParser,
   validateBody(resetPasswordSchema),
   ctrlWrapper(resetPasswordController),
+);
+
+router.get('/get-oauth-url', ctrlWrapper(getOAuthURLController));
+
+router.post(
+  '/confirm-oauth',
+  jsonParser,
+  validateBody(confirmOauthSchema),
+  ctrlWrapper(confirmOauthController),
 );
 
 export default router;

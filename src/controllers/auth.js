@@ -7,6 +7,8 @@ import {
   resetPassword,
 } from '../services/auth.js';
 
+import { generateOAuthURL, validateCode } from '../utils/googleOAuth2.js';
+
 export async function registerController(req, res) {
   const { name, email, password } = req.body;
 
@@ -129,15 +131,27 @@ export const resetPasswordController = async (req, res, next) => {
     });
   }
 
-  try {
-    await resetPassword({ token, password });
-
-    res.status(200).send({
-      status: 200,
-      message: 'Password has been successfully reset.',
-      data: {},
-    });
-  } catch (err) {
-    next(err); 
-  }
+  await resetPassword(password, token);
+  res.send({
+    status: 200,
+    message: 'Password has been successfully reset.',
+    data: {},
+  });
 };
+
+export async function getOAuthURLController(req, res) {
+  const url = generateOAuthURL();
+  res.send({
+    status: 200,
+    message: 'Successfully get Google OAuth URL',
+    data: url,
+  });
+}
+
+export async function confirmOauthController(req, res) {
+  const { code } = req.body;
+
+  await validateCode(code);
+
+  res.send({ status: 200 });
+}
